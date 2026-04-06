@@ -11,7 +11,7 @@ const isBuild = process.argv.includes("build");
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://autodex.pages.dev",
+  site: "https://autodex.ygtadk100.workers.dev",
   base: "/",
 
   fonts: [
