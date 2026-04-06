@@ -17,7 +17,8 @@
     "db:verify": "astro db verify --remote",
     "db:seed": "astro db execute db/seed.ts --remote",
     "db:push": "astro db push --remote",
-    "generate-types": "wrangler types"
+    "generate-types": "wrangler types",
+    "postinstall": "node patches/apply.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.7",
