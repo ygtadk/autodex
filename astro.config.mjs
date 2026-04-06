@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
+import { fileURLToPath } from "node:url";
 
 import sitemap from "@astrojs/sitemap";
 import db from "@astrojs/db";
@@ -13,6 +14,16 @@ const isBuild = process.argv.includes("build");
 export default defineConfig({
   site: "https://autodex.ygtadk100.workers.dev",
   base: "/",
+
+  // @libsql/hrana-client → cross-fetch → node-fetch zinciri workerd'de çöküyor.
+  // cross-fetch'i browser ponyfill'e alias'layarak global fetch kullanmasını sağlıyoruz.
+  vite: isBuild ? {
+    resolve: {
+      alias: {
+        "cross-fetch": fileURLToPath(new URL("node_modules/cross-fetch/dist/browser-ponyfill.js", import.meta.url))
+      }
+    }
+  } : {},
 
   fonts: [
     {
