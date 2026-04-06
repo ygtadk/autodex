@@ -1,0 +1,49 @@
+---
+import { ClientRouter } from "astro:transitions";
+
+import { Font } from "astro:assets";
+
+const { title = "AutoDex", ...props } = Astro.props;
+const ogMeta = {
+	title: props.ogTitle || "title",
+	description: props.ogDescription || "AutoDex",
+	image: props.ogImage,
+	url: props.ogUrl || Astro.site || "",
+	type: props.ogType || "website",
+	locale: props.ogLocale || "en_US",
+};
+---
+
+<html lang="en">
+	<head>
+		<title>{title}</title>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta property="og:title" content={ogMeta.title} />
+		<meta property="og:description" content={ogMeta.description} />
+		<meta property="og:image" content={ogMeta.image} />
+		<meta property="og:url" content={ogMeta.url} />
+		<meta property="og:type" content={ogMeta.type} />
+		<meta property="og:locale" content={ogMeta.locale} />
+
+		<Font cssVariable="--font-geist" />
+		<style>
+			:root {
+				font-family: var(--font-geist), system-ui, -apple-system;
+			}
+		</style>
+		<slot name="head" />
+	</head>
+	<body>
+		<!-- Main content will be injected here -->
+		<slot>
+			<h1>
+				This page is not using the 'slot' correctly or is missing content.
+			</h1>
+		</slot>
+	</body>
+</html>
