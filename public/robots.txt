@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://localhost:4321/sitemap-index.xml
+Sitemap: https://autodex.pages.dev/sitemap-index.xml
