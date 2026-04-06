@@ -51,3 +51,6 @@ COPILOT.md
 .github/instructions/*.md
 .github/*.md
 
+# cloudflare
+.wrangler/
+

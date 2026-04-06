@@ -1,0 +1,269 @@
+---
+export const prerender = false;
+
+import { db, CarBrands, CarModels, CarGenerations, CarEngines, CarTransmissions, CarTrims, CarImages } from 'astro:db';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const [brands, models, generations, engines, transmissions, trims, images] = await Promise.all([
+  db.select().from(CarBrands),
+  db.select().from(CarModels),
+  db.select().from(CarGenerations),
+  db.select().from(CarEngines),
+  db.select().from(CarTransmissions),
+  db.select().from(CarTrims),
+  db.select().from(CarImages),
+]);
+
+const tableSections = [
+  {
+    title: 'Brands',
+    description: 'Marka kayıtları',
+    rows: brands,
+  },
+  {
+    title: 'Models',
+    description: 'Model kayıtları',
+    rows: models,
+  },
+  {
+    title: 'Generations',
+    description: 'Jenerasyon kayıtları',
+    rows: generations,
+  },
+  {
+    title: 'Engines',
+    description: 'Motor kayıtları',
+    rows: engines,
+  },
+  {
+    title: 'Transmissions',
+    description: 'Şanzıman kayıtları',
+    rows: transmissions,
+  },
+  {
+    title: 'Trims',
+    description: 'Donanım kayıtları',
+    rows: trims,
+  },
+  {
+    title: 'Images',
+    description: 'Görsel kayıtları',
+    rows: images,
+  },
+];
+
+const serializeValue = (value: unknown) => {
+  if (value == null) {
+    return '—';
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+};
+---
+
+<BaseLayout title="AutoDex Demo DB View">
+  <main class="demo-shell">
+    <section class="hero">
+      <p class="eyebrow">Astro DB Demo</p>
+      <h1>Remote veri kontrol sayfası</h1>
+      <p class="lead">
+        Bu sayfa Astro DB tablolarını doğrudan okuyup mevcut kayıtları ham tablo görünümünde listeler.
+      </p>
+    </section>
+
+    {
+      tableSections.map((section) => {
+        const columns = section.rows.length > 0 ? Object.keys(section.rows[0]) : [];
+
+        return (
+          <section class="table-section">
+            <div class="section-header">
+              <div>
+                <p class="section-kicker">{section.description}</p>
+                <h2>{section.title}</h2>
+              </div>
+              <p class="row-count">{section.rows.length} kayıt</p>
+            </div>
+
+            {
+              section.rows.length === 0 ? (
+                <p class="empty-state">Bu tabloda henüz veri yok.</p>
+              ) : (
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        {columns.map((column) => <th>{column}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.map((row) => (
+                        <tr>
+                          {columns.map((column) => <td>{serializeValue(row[column as keyof typeof row])}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            }
+          </section>
+        );
+      })
+    }
+  </main>
+
+  <style>
+    :global(body) {
+      margin: 0;
+      background:
+        radial-gradient(circle at top, rgba(196, 223, 255, 0.35), transparent 30%),
+        linear-gradient(180deg, #f6f4ed 0%, #ece6d7 100%);
+      color: #1f2933;
+    }
+
+    .demo-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 1.25rem 6rem;
+    }
+
+    .hero {
+      margin-bottom: 2rem;
+      padding: 2rem;
+      border: 1px solid rgba(31, 41, 51, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 252, 245, 0.75);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 60px rgba(31, 41, 51, 0.08);
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .row-count {
+      margin: 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8b5e34;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      font-family: var(--font-geist), serif;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+
+    h1 {
+      margin-top: 0.5rem;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    .lead {
+      max-width: 60ch;
+      margin: 1rem 0 0;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #52606d;
+    }
+
+    .table-section {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border: 1px solid rgba(31, 41, 51, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 10px 30px rgba(31, 41, 51, 0.06);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      margin-top: 0.35rem;
+      font-size: 1.5rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(82, 96, 109, 0.15);
+      background: #fffdf8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      font-size: 0.92rem;
+    }
+
+    th,
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(82, 96, 109, 0.12);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f4eee2;
+      color: #7c4f29;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    td {
+      color: #364152;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(244, 238, 226, 0.45);
+    }
+
+    .empty-state {
+      margin: 0;
+      padding: 1rem 1.1rem;
+      border-radius: 16px;
+      background: rgba(244, 238, 226, 0.8);
+      color: #52606d;
+    }
+
+    @media (max-width: 720px) {
+      .demo-shell {
+        padding-top: 2rem;
+      }
+
+      .hero,
+      .table-section {
+        border-radius: 18px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</BaseLayout>

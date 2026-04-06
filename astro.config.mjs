@@ -3,11 +3,17 @@ import { defineConfig, fontProviders } from "astro/config";
 
 import sitemap from "@astrojs/sitemap";
 import db from "@astrojs/db";
+import cloudflare from "@astrojs/cloudflare";
+
+// Cloudflare adapter'ın workerd SSR ortamı, dev modunda @astrojs/db ile uyumsuz.
+// Adapter yalnızca build sırasında yüklenir (withastro/astro#16114).
+const isBuild = process.argv.includes("build");
 
 // https://astro.build/config
 export default defineConfig({
-  site: "http://localhost:4321",
+  site: "https://autodex.pages.dev",
   base: "/",
+
   fonts: [
     {
       name: "Roboto",
@@ -30,6 +36,7 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
     }
   ],
+
   integrations: [
     sitemap({
       i18n: {
@@ -40,6 +47,14 @@ export default defineConfig({
         },
       },
     }), 
-    db()
-  ]
+    db({
+      mode: isBuild ? 'web' : 'node',
+    })
+  ],
+
+  adapter: isBuild
+    ? cloudflare({
+        imageService: { build: 'compile', runtime: 'cloudflare-binding' }
+      })
+    : undefined
 });
